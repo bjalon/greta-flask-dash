@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask_bootstrap import Bootstrap
+import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 from dash import Dash, dcc, html
@@ -45,7 +46,10 @@ data = pd.DataFrame({
     "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
 })
 
-fig = px.bar(data, x="Fruit", y="Amount", color="City", barmode="group")
+# fig = px.bar(data, x="Fruit", y="Amount", color="City", barmode="group")
+fig = go.Figure()
+fig.add_scatter(x=[1, 2, 3], y=[4, 2, 3])
+fig.add_scatter(x=[1, 2, 3, 4], y=[4, 5, 2, 3])
 
 dash_app.layout = html.Div(children=[
     navbar,
@@ -63,4 +67,5 @@ def test_bootstrap():
 
 @app.route("/dash", methods=['GET', 'POST'])
 def dash_endpoint():
+
     return dash_app.index()
