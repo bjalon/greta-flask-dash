@@ -9,6 +9,8 @@ unidecode = "*"
 flask-wtf = "*"
 email-validator = "*"
 flask-bootstrap = "*"
+dash = "*"
+pandas = "*"
 
 [dev-packages]
 
