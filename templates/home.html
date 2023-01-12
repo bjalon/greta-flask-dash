@@ -1,0 +1,18 @@
+{% extends "bootstrap/base.html" %}
+{% import "navbar_macro.html" as navbar %}
+
+{% block title %}Greta - Dash{% endblock %}
+
+{% block navbar %}
+    {{ navbar.render('home') }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Formation GRETA</h1>
+            <p>Accéder au Dashboard</p>
+            <p><a class="btn btn-primary btn-lg" href="#" role="button">Dashboard</a></p>
+        </div>
+    </div>
+{% endblock %}

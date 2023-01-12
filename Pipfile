@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "greta-flask-dash"
+
+[packages]
+flask = "~=2.2.2"
+unidecode = "*"
+flask-wtf = "*"
+email-validator = "*"
+flask-bootstrap = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
