@@ -11,6 +11,7 @@ email-validator = "*"
 flask-bootstrap = "*"
 dash = "*"
 pandas = "*"
+dash-bootstrap-components = "*"
 
 [dev-packages]
 
