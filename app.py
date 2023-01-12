@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask_bootstrap import Bootstrap
+import plotly.express as px
 import pandas as pd
 from dash import Dash, dcc, html
 import dash_bootstrap_components as dbc
@@ -32,20 +33,26 @@ navbar = dbc.Navbar(
 
         ),
         html.Div(html.Ul([
-            html.Li([
-                dbc.NavItem(dbc.NavLink("Home", href="/", external_link=True, style={'color': 'white'}))
-            ])
+            html.Li(dbc.NavItem(dbc.NavLink("Home", href="/", external_link=True, style={'color': '#9d9d9d'}))),
+            html.Li(dbc.NavItem(dbc.NavLink("Stats", active=True, href="/dash", style={'color': 'white'})))
         ], className="nav navbar-nav")
             , className="navbar-collapse collapse")
     ])])
 
+data = pd.DataFrame({
+    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
+    "Amount": [4, 1, 2, 2, 4, 5],
+    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
+})
+
+fig = px.bar(data, x="Fruit", y="Amount", color="City", barmode="group")
+
 dash_app.layout = html.Div(children=[
     navbar,
-    html.H1(children='Hello Dash'),
-    html.Div(children='''
-        Dash: A web application framework for your data.
-    '''),
-
+    dcc.Graph(
+        id='example-graph',
+        figure=fig
+    )
 ])
 
 
