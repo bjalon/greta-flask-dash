@@ -6,9 +6,10 @@ from dash import Dash, dcc, html
 import greta_dash.fig as fig
 import greta_dash.navbar as navbar
 
-from db.config import Config
+from db.config import Config, logger_config, DATABASE_PATH
 from db.extensions import db
 from db.models.user import User
+from logging.config import dictConfig
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'kjhfdkjhgjkdfhgkjdfhg'
@@ -22,7 +23,8 @@ dash_app = Dash(
 )
 dash_app.layout = html.Div(children=[navbar, dcc.Graph(id='example-graph', figure=fig)])
 app.config.from_object(Config)
-
+dictConfig(logger_config)
+app.logger.error(f"database location: {DATABASE_PATH}")
 db.init_app(app)
 
 with app.app_context():
@@ -45,6 +47,7 @@ def user_creation():
     email = request.args["email"]
     password = request.args["password"]
     user = User(username=username, email=email, password=password)
+    app.logger.info(f"Utilisateur créé: {username} {email} {password} ")
     db.session.add(user)
     db.session.commit()
     return "ok"
@@ -54,6 +57,7 @@ def user_creation():
 def user_update(username):
     email = request.args["email"]
     password = request.args["password"]
+    app.logger.info(f"Utilisateur mis à jour: {username} ({email}, {password})")
     db.session.query(User).filter(User.username == username).update(
         {"email": email, "password": password}, synchronize_session="fetch"
     )
@@ -63,6 +67,7 @@ def user_update(username):
 
 @app.route("/user/<username>", methods=['DELETE'])
 def user_delete(username):
+    app.logger.info(f"Utilisateur supprimé: {username}")
     user = User.get_by_username(username)
     db.session.delete(user)
     db.session.commit()
@@ -71,8 +76,9 @@ def user_delete(username):
 
 @app.route("/user/<username>", methods=['GET'])
 def user_get(username):
+    app.logger.info(f"Utilisateur récupéré: {username}")
     user = User.get_by_username(username)
-    return str(user)
+    return repr(user)
 
 
 @app.route("/users", methods=['GET'])

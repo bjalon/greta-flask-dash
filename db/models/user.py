@@ -24,22 +24,4 @@ class User(db.Model):
         db.session.commit()
 
     def __repr__(self):
-        """
-        {
-            "id"="%s",
-            "username"="%s",
-            "email"="%s",
-            "password"="%s",
-            "is_active"="%s",
-            "created_at"="%s",
-            "updated_at"="%s",
-        }
-        """.format(
-            self.id,
-            self.username,
-            self.email,
-            self.password,
-            self.is_active,
-            self.created_at,
-            self.updated_at,
-        )
+        return 'User{"id"="' + str(self.id) + '", "username"="' + self.username + '", "email"="' + self.email + '", "password"="' + self.password + '", "is_active"="' + str(self.is_active) + '", "created_at"="' + str(self.created_at) + '", "updated_at"="' + str(self.updated_at) + '"}'
