@@ -18,6 +18,7 @@ psycopg2-binary = "*"
 passlib = "*"
 alembic = "*"
 flask-restful = "*"
+pytest = "*"
 
 [dev-packages]
 
