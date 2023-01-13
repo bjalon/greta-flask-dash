@@ -6,10 +6,12 @@ DATABASE_PATH = os.path.join(basedir, 'data.sqlite')
 
 class Config:
     DEBUG = True
+    BOOTSTRAP_SERVE_LOCAL = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = 'kjhfdkjhgjkdfhgkjdfhg'
 
-
+ 
 logger_config = {
     'version': 1,
     'formatters': {

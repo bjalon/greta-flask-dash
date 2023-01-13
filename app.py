@@ -20,8 +20,6 @@ from logging.config import dictConfig
 dictConfig(logger_config)
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'kjhfdkjhgjkdfhgkjdfhg'
-app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 bootstrap = Bootstrap(app)
 dash_app = Dash(
     __name__,
