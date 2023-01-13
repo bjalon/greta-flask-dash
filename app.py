@@ -1,4 +1,9 @@
+import os
 from flask import Flask
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
+from wtforms import SubmitField, StringField
+from wtforms.validators import DataRequired
 from flask import render_template, request
 from flask_bootstrap import Bootstrap
 import dash_bootstrap_components as dbc
@@ -9,7 +14,10 @@ import greta_dash.navbar as navbar
 from db.config import Config, logger_config, DATABASE_PATH
 from db.extensions import db
 from db.models.user import User
+from db.models.animal_data import AnimalData
 from logging.config import dictConfig
+
+dictConfig(logger_config)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'kjhfdkjhgjkdfhgkjdfhg'
@@ -23,7 +31,6 @@ dash_app = Dash(
 )
 dash_app.layout = html.Div(children=[navbar, dcc.Graph(id='example-graph', figure=fig)])
 app.config.from_object(Config)
-dictConfig(logger_config)
 app.logger.error(f"database location: {DATABASE_PATH}")
 db.init_app(app)
 
@@ -39,6 +46,28 @@ def test_bootstrap():
 @app.route("/dash", methods=['GET', 'POST'])
 def dash_endpoint():
     return dash_app.index()
+
+
+class AnimalDataForm(FlaskForm):
+    audio_file = FileField("Fichier audio")
+    animal_name = StringField("Indiquer l'animal", validators=[DataRequired()])
+    submit = SubmitField("Envoyer")
+
+
+@app.route("/animals_data_collector", methods=['GET', 'POST'])
+def animals_data_collector():
+    form = AnimalDataForm()
+    if form.validate_on_submit():
+        uploaded_file = form.audio_file.data
+        filename = uploaded_file.filename
+        if filename != '':
+            uploaded_file.save(os.path.join("data", filename))
+            animal_name = form.animal_name.data
+            animal_data = AnimalData(file=filename, animal=animal_name)
+            db.session.add(animal_data)
+            db.session.commit()
+    rows = db.session.query(AnimalData).all()
+    return render_template("animal_collector.html", form=form, rows=rows)
 
 
 @app.route("/user", methods=['POST'])

@@ -1,0 +1,32 @@
+{% extends "bootstrap/base.html" %}
+{% import "navbar_macro.html" as navbar %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Greta - Animal{% endblock %}
+
+{% block navbar %}
+    {{ navbar.render('animal') }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {{ wtf.quick_form(form) }}
+
+        <div>
+
+            {% for row in rows %}
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="{{ row.animal }}.jpg" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ row.animal }}</h5>
+                        <p class="card-text">{{ row.file }}</p>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+    </div>
+
+
+{% endblock %}
