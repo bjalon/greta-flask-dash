@@ -12,6 +12,12 @@ flask-bootstrap = "*"
 dash = "*"
 pandas = "*"
 dash-bootstrap-components = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+psycopg2-binary = "*"
+passlib = "*"
+alembic = "*"
+flask-restful = "*"
 
 [dev-packages]
 

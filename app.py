@@ -1,63 +1,32 @@
 from flask import Flask
-from flask import render_template
+from flask import render_template, request
 from flask_bootstrap import Bootstrap
-import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
-from dash import Dash, dcc, html
 import dash_bootstrap_components as dbc
+from dash import Dash, dcc, html
+import greta_dash.fig as fig
+import greta_dash.navbar as navbar
+
+from db.config import Config
+from db.extensions import db
+from db.models.user import User
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'kjhfdkjhgjkdfhgkjdfhg'
-bootstrap = Bootstrap(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
+bootstrap = Bootstrap(app)
 dash_app = Dash(
     __name__,
     server=app,
-    url_base_pathname='/dash/',
+    url_base_pathname='/greta_dash/',
     external_stylesheets=[dbc.themes.BOOTSTRAP]
 )
+dash_app.layout = html.Div(children=[navbar, dcc.Graph(id='example-graph', figure=fig)])
+app.config.from_object(Config)
 
-soccer = pd.read_csv('data/fifa_soccer_players.csv')
+db.init_app(app)
 
-LOGO = "https://gretaformation.ac-orleans-tours.fr/sites/all/themes/themes/adscom/images/logo.jpg"
-navbar = dbc.Navbar(
-    color="dark", dark=True,
-    children=[dbc.Container([
-        html.A(
-            href="/", style={"textDecoration": "none"},
-            children=dbc.Row(
-                align="center", className="g-0",
-                children=[
-                    dbc.Col(html.Img(src=LOGO, height="36px")),
-                ]),
-
-        ),
-        html.Div(html.Ul([
-            html.Li(dbc.NavItem(dbc.NavLink("Home", href="/", external_link=True, style={'color': '#9d9d9d'}))),
-            html.Li(dbc.NavItem(dbc.NavLink("Stats", active=True, href="/dash", style={'color': 'white'})))
-        ], className="nav navbar-nav")
-            , className="navbar-collapse collapse")
-    ])])
-
-data = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
-})
-
-# fig = px.bar(data, x="Fruit", y="Amount", color="City", barmode="group")
-fig = go.Figure()
-fig.add_scatter(x=[1, 2, 3], y=[4, 2, 3])
-fig.add_scatter(x=[1, 2, 3, 4], y=[4, 5, 2, 3])
-
-dash_app.layout = html.Div(children=[
-    navbar,
-    dcc.Graph(
-        id='example-graph',
-        figure=fig
-    )
-])
+with app.app_context():
+    db.create_all()
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -67,5 +36,47 @@ def test_bootstrap():
 
 @app.route("/dash", methods=['GET', 'POST'])
 def dash_endpoint():
-
     return dash_app.index()
+
+
+@app.route("/user", methods=['POST'])
+def user_creation():
+    username = request.args["username"]
+    email = request.args["email"]
+    password = request.args["password"]
+    user = User(username=username, email=email, password=password)
+    db.session.add(user)
+    db.session.commit()
+    return "ok"
+
+
+@app.route("/user/<username>", methods=['PUT'])
+def user_update(username):
+    email = request.args["email"]
+    password = request.args["password"]
+    db.session.query(User).filter(User.username == username).update(
+        {"email": email, "password": password}, synchronize_session="fetch"
+    )
+    db.session.commit()
+    return "ok"
+
+
+@app.route("/user/<username>", methods=['DELETE'])
+def user_delete(username):
+    user = User.get_by_username(username)
+    db.session.delete(user)
+    db.session.commit()
+    return "ok"
+
+
+@app.route("/user/<username>", methods=['GET'])
+def user_get(username):
+    user = User.get_by_username(username)
+    return str(user)
+
+
+@app.route("/users", methods=['GET'])
+def user_search():
+    query = request.args["query"]
+    users = db.session.query(User).filter(User.email.like(f'%{query}%'))
+    return users
